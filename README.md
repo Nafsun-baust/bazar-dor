@@ -34,3 +34,23 @@ You can check out [the Next.js GitHub repository](https://github.com/vercel/next
 The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+# Bazar Dor 
+
+A responsive web application for tracking daily commodity prices in Bangladesh.
+
+### Features
+- Interactive navbar and live price ticker.
+- Product listings with price changes and categories.
+- Product details with market-wise price breakdowns.
+- BetterAuth authentication (Email & Google).
+- Profile management and toast notifications.
+- Responsive design for all devices.
+
+### Technologies
+Next.js, TypeScript, Tailwind CSS, DaisyUI, BetterAuth.
+
+### Live Link & Repository
+- **Live:** https://bazar-dor-nafsun.vercel.app
+- **GitHub:** https://github.com/Nafsun-baust/B14-A7-Bazar-Dor
