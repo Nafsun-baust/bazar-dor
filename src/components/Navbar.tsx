@@ -1,19 +1,32 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { TCategory } from "@/types/category";
+import { authClient, useSession } from "@/lib/auth-client";
 
 export default function Navbar() {
   const [categories, setCategories] = useState<TCategory[]>([]);
   const pathname = usePathname();
+  const router = useRouter();
+  const { data: session, isPending } = useSession();
 
   useEffect(() => {
     fetch("https://openapi.programming-hero.com/api/bazardor/categories")
       .then((res) => res.json())
       .then((data) => setCategories(data));
   }, []);
+
+  const handleSignOut = async () => {
+    await authClient.signOut({
+      fetchOptions: {
+        onSuccess: () => {
+          router.push("/signin");
+        },
+      },
+    });
+  };
 
   const formattedDate = new Date().toLocaleDateString("bn-BD", {
     weekday: "long",
@@ -47,15 +60,71 @@ export default function Navbar() {
         </div>
 
         <div className="navbar-end gap-2">
-          <Link href="/signin" className="btn btn-ghost btn-sm">
-            Sign In
-          </Link>
-          <Link
-            href="/signup"
-            className="btn btn-sm border-none bg-[#1B7F4B] text-white hover:bg-[#15663C]"
-          >
-            Sign Up
-          </Link>
+          {isPending ? (
+            <span className="loading loading-spinner loading-sm text-[#1B7F4B]" />
+          ) : session?.user ? (
+            <div className="dropdown dropdown-end">
+              <div
+                tabIndex={0}
+                role="button"
+                className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 py-1 pr-3 pl-1.5 hover:bg-gray-100"
+              >
+                {session.user.image ? (
+                  <Image
+                    src={session.user.image}
+                    alt={session.user.name}
+                    width={32}
+                    height={32}
+                    className="h-8 w-8 rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1B7F4B] text-xs font-bold text-white">
+                    {session.user.name?.charAt(0).toUpperCase()}
+                  </div>
+                )}
+                <span className="hidden text-xs font-semibold text-gray-800 sm:inline">
+                  {session.user.name}
+                </span>
+              </div>
+
+              <ul
+                tabIndex={0}
+                className="menu dropdown-content z-50 mt-2 w-52 rounded-2xl border border-gray-100 bg-white p-2 shadow-lg"
+              >
+                <li className="border-b border-gray-100 px-3 py-2 text-xs text-gray-500">
+                  <span className="block truncate font-semibold text-gray-900">
+                    {session.user.name}
+                  </span>
+                  <span className="block truncate">{session.user.email}</span>
+                </li>
+                <li className="mt-1">
+                  <Link href="/profile" className="text-xs font-medium">
+                    প্রোফাইল দেখুন
+                  </Link>
+                </li>
+                <li>
+                  <button
+                    onClick={handleSignOut}
+                    className="text-xs font-semibold text-red-600 hover:bg-red-50"
+                  >
+                    লগ আউট
+                  </button>
+                </li>
+              </ul>
+            </div>
+          ) : (
+            <>
+              <Link href="/signin" className="btn btn-ghost btn-sm">
+                Sign In
+              </Link>
+              <Link
+                href="/signup"
+                className="btn btn-sm border-none bg-[#1B7F4B] text-white hover:bg-[#15663C]"
+              >
+                Sign Up
+              </Link>
+            </>
+          )}
         </div>
       </div>
 
