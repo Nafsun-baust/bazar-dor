@@ -1,15 +1,13 @@
 "use client";
-import { useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { authClient, useSession } from "@/lib/auth-client";
 
 export default function ProfilePage() {
     const router = useRouter();
     const { data: session, isPending } = useSession();
-    const [name, setName] = useState<string | null>(null);
-    const [msg, setMsg] = useState("");
-    const [saving, setSaving] = useState(false);
 
     if (isPending) {
         return (
@@ -21,28 +19,15 @@ export default function ProfilePage() {
 
     if (!session?.user) return null;
 
-    const currentName = name ?? session.user.name ?? "";
-
     const handleSignOut = async () => {
         await authClient.signOut({
             fetchOptions: {
                 onSuccess: () => {
+                    toast.success("সফলভাবে সাইন আউট হয়েছে");
                     router.push("/signin");
                 },
             },
         });
-    };
-
-    const handleUpdate = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setSaving(true);
-        setMsg("");
-
-        const { error } = await authClient.updateUser({ name: currentName });
-
-        setSaving(false);
-        setMsg(error ? "আপডেট ব্যর্থ হয়েছে" : "প্রোফাইল আপডেট হয়েছে");
-        router.refresh();
     };
 
     return (
@@ -89,34 +74,26 @@ export default function ProfilePage() {
             <div className="rounded-2xl border border-gray-200 bg-white p-6">
                 <h2 className="text-base font-bold text-gray-900">তথ্য</h2>
 
-                <form onSubmit={handleUpdate} className="mt-4 space-y-4">
-                    {msg && (
-                        <p className="rounded-lg bg-[#eaf4ec] p-2.5 text-xs font-semibold text-[#1B7F4B]">
-                            {msg}
-                        </p>
-                    )}
-
+                <div className="mt-4 space-y-4">
                     <div>
                         <label className="mb-1.5 block text-xs font-medium text-gray-600">
                             নাম
                         </label>
                         <input
                             type="text"
-                            required
-                            value={currentName}
-                            onChange={(e) => setName(e.target.value)}
-                            className="input input-bordered w-full rounded-lg border-gray-200 text-sm focus:border-[#1B7F4B] focus:outline-none"
+                            readOnly
+                            value={session.user.name}
+                            className="input input-bordered w-full rounded-lg border-gray-200 bg-white text-sm text-gray-800 focus:outline-none"
                         />
                     </div>
 
-                    <button
-                        type="submit"
-                        disabled={saving}
+                    <Link
+                        href="/profile/update"
                         className="btn w-full rounded-lg border-none bg-[#1B7F4B] text-white hover:bg-[#15663C]"
                     >
-                        {saving ? "আপডেট হচ্ছে..." : "আপডেট"}
-                    </button>
-                </form>
+                        আপডেট
+                    </Link>
+                </div>
             </div>
         </div>
     );

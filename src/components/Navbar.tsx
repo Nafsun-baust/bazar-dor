@@ -1,8 +1,10 @@
 "use client";
+
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import toast from "react-hot-toast";
 import { TCategory } from "@/types/category";
 import { authClient, useSession } from "@/lib/auth-client";
 
@@ -22,6 +24,7 @@ export default function Navbar() {
     await authClient.signOut({
       fetchOptions: {
         onSuccess: () => {
+          toast.success("সফলভাবে সাইন আউট হয়েছে");
           router.push("/signin");
         },
       },
@@ -67,47 +70,57 @@ export default function Navbar() {
               <div
                 tabIndex={0}
                 role="button"
-                className="flex cursor-pointer items-center gap-2 rounded-full border border-gray-200 bg-gray-50 py-1 pr-3 pl-1.5 hover:bg-gray-100"
+                className="flex cursor-pointer items-center gap-2.5 px-2 py-1"
               >
                 {session.user.image ? (
                   <Image
                     src={session.user.image}
                     alt={session.user.name}
-                    width={32}
-                    height={32}
-                    className="h-8 w-8 rounded-full object-cover"
+                    width={36}
+                    height={36}
+                    className="h-9 w-9 rounded-lg object-cover"
                   />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#1B7F4B] text-xs font-bold text-white">
+                  <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#1B7F4B] text-sm font-bold text-white">
                     {session.user.name?.charAt(0).toUpperCase()}
                   </div>
                 )}
-                <span className="hidden text-xs font-semibold text-gray-800 sm:inline">
-                  {session.user.name}
+                <span className="hidden text-sm font-semibold text-gray-800 sm:inline">
+                  {session.user.name?.split(" ")[0]}
                 </span>
+                <span className="text-xs text-gray-500">▾</span>
               </div>
 
               <ul
                 tabIndex={0}
-                className="menu dropdown-content z-50 mt-2 w-52 rounded-2xl border border-gray-100 bg-white p-2 shadow-lg"
+                className="menu dropdown-content z-50 mt-3 w-56 rounded-2xl border border-gray-100 bg-white p-3 shadow-lg"
               >
-                <li className="border-b border-gray-100 px-3 py-2 text-xs text-gray-500">
-                  <span className="block truncate font-semibold text-gray-900">
-                    {session.user.name}
-                  </span>
-                  <span className="block truncate">{session.user.email}</span>
+                <li className="pointer-events-none px-2 py-1.5">
+                  <div className="flex flex-col items-start gap-0.5 p-0">
+                    <span className="text-sm font-bold text-gray-900">
+                      {session.user.name}
+                    </span>
+                    <span className="text-xs text-gray-500">
+                      {session.user.email}
+                    </span>
+                  </div>
                 </li>
                 <li className="mt-1">
-                  <Link href="/profile" className="text-xs font-medium">
-                    প্রোফাইল দেখুন
+                  <Link
+                    href="/profile"
+                    className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-xs font-medium text-gray-700 hover:bg-gray-50"
+                  >
+                    <span>👤</span>
+                    <span>আমার প্রোফাইল</span>
                   </Link>
                 </li>
                 <li>
                   <button
                     onClick={handleSignOut}
-                    className="text-xs font-semibold text-red-600 hover:bg-red-50"
+                    className="flex items-center gap-2.5 rounded-lg px-2 py-2 text-xs font-medium text-red-500 hover:bg-red-50"
                   >
-                    লগ আউট
+                    <span>↪</span>
+                    <span>সাইন আউট</span>
                   </button>
                 </li>
               </ul>
