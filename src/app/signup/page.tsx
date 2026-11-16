@@ -4,16 +4,15 @@ import { useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [errorMsg, setErrorMsg] = useState("");
   const [loading, setLoading] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg("");
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -25,18 +24,19 @@ export default function SignUpPage() {
       name,
       email,
       password,
-      callbackURL: "/",
     });
 
     setLoading(false);
 
     if (error) {
-      setErrorMsg(error.message || "নিবন্ধন সম্পন্ন করা যায়নি");
+      toast.error(error.message || "নিবন্ধন সম্পন্ন করা যায়নি");
       return;
     }
 
     if (data) {
-      router.push("/");
+      await authClient.signOut();
+      toast.success("নিবন্ধন সফল হয়েছে! এখন সাইন ইন করুন");
+      router.push("/signin");
     }
   };
 
@@ -59,12 +59,6 @@ export default function SignUpPage() {
             বাজার দর প্ল্যাটফর্মে নিবন্ধন করুন
           </p>
         </div>
-
-        {errorMsg && (
-          <div className="mb-4 rounded-xl bg-red-50 p-3 text-center text-xs font-medium text-red-600">
-            {errorMsg}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

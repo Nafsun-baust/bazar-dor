@@ -1,19 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
+import toast from "react-hot-toast";
 import { authClient } from "@/lib/auth-client";
 
 export default function SignInPage() {
   const router = useRouter();
-  const [errorMsg, setErrorMsg] = useState("");
+  const searchParams = useSearchParams();
   const [loading, setLoading] = useState(false);
+  const toastedRef = useRef(false);
+
+  useEffect(() => {
+    if (searchParams.get("unauthorized") === "1" && !toastedRef.current) {
+      toastedRef.current = true;
+      toast.error("এই পেজটি দেখতে আগে সাইন ইন করুন");
+    }
+  }, [searchParams]);
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    setErrorMsg("");
     setLoading(true);
 
     const formData = new FormData(e.currentTarget);
@@ -23,18 +31,19 @@ export default function SignInPage() {
     const { data, error } = await authClient.signIn.email({
       email,
       password,
-      callbackURL: "/",
     });
 
     setLoading(false);
 
     if (error) {
-      setErrorMsg(error.message || "ইমেইল বা পাসওয়ার্ড সঠিক নয়");
+      toast.error(error.message || "ইমেইল বা পাসওয়ার্ড সঠিক নয়");
       return;
     }
 
     if (data) {
+      toast.success("সফলভাবে সাইন ইন হয়েছে");
       router.push("/");
+      router.refresh();
     }
   };
 
@@ -57,12 +66,6 @@ export default function SignInPage() {
             আপনার বাজার দর অ্যাকাউন্টে প্রবেশ করুন
           </p>
         </div>
-
-        {errorMsg && (
-          <div className="mb-4 rounded-xl bg-red-50 p-3 text-center text-xs font-medium text-red-600">
-            {errorMsg}
-          </div>
-        )}
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>

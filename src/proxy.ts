@@ -5,8 +5,10 @@ export async function proxy(request: NextRequest) {
   const session = getSessionCookie(request);
   const { pathname } = request.nextUrl;
 
-  if (!session && pathname.startsWith("/profile")) {
-    return NextResponse.redirect(new URL("/signin", request.url));
+  if (!session &&(pathname.startsWith("/profile") || pathname.startsWith("/product"))) {
+    const signInUrl = new URL("/signin", request.url);
+    signInUrl.searchParams.set("unauthorized", "1");
+    return NextResponse.redirect(signInUrl);
   }
 
   if (session && (pathname === "/signin" || pathname === "/signup")) {
@@ -17,5 +19,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/profile/:path*", "/signin", "/signup"],
+  matcher: ["/profile/:path*", "/product/:path*", "/signin", "/signup"],
 };
