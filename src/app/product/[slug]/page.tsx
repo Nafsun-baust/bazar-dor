@@ -1,4 +1,7 @@
 import Link from "next/link";
+import { headers } from "next/headers";
+import { redirect } from "next/navigation";
+import { auth } from "@/lib/auth";
 import { TProductPrice } from "@/types/product";
 
 const unitBn: Record<string, string> = {
@@ -9,18 +12,26 @@ const unitBn: Record<string, string> = {
   dozen: "ডজন",
 };
 
-export default async function ProductDetailsPage({params,}: {params: Promise<{ slug: string }>;}){
+export default async function ProductDetailsPage({params,}: {params: Promise<{ slug: string }>;}) {
+  const session = await auth.api.getSession({ headers: await headers() });
+  if (!session) redirect("/signin?unauthorized=1");
+
   const { slug } = await params;
-  const res = await fetch("https://openapi.programming-hero.com/api/bazardor/products");
+  const res = await fetch(
+    "https://openapi.programming-hero.com/api/bazardor/products"
+  );
   const products: TProductPrice[] = await res.json();
   const product = products.find((item) => item.slug === slug);
 
   if (!product) {
     return (
       <div className="py-20 text-center">
-        <p className="text-lg font-bold">পণ্যটি পাওয়া যায়নি</p>
-        <Link href="/" className="btn btn-sm mt-3 bg-[#1B7F4B] text-white">
-          হোমে ফিরুন
+        <p className="text-lg font-bold text-gray-900">পণ্যটি পাওয়া যায়নি</p>
+        <Link
+          href="/"
+          className="btn btn-sm mt-3 border-none bg-[#1B7F4B] text-white hover:bg-[#15663C]"
+        >
+          হোম পেজে ফিরে যান
         </Link>
       </div>
     );
@@ -42,9 +53,14 @@ export default async function ProductDetailsPage({params,}: {params: Promise<{ s
   return (
     <div className="mx-auto max-w-5xl space-y-6 px-4 py-8">
       <div className="flex items-center gap-2 text-xs text-gray-500">
-        <Link href="/" className="hover:text-[#1B7F4B]">হোম</Link>
+        <Link href="/" className="hover:text-[#1B7F4B]">
+          হোম
+        </Link>
         <span>/</span>
-        <Link href={`/category/${product.category}`} className="hover:text-[#1B7F4B]">
+        <Link
+          href={`/category/${product.category}`}
+          className="hover:text-[#1B7F4B]"
+        >
           {product.categoryNameBn}
         </Link>
         <span>/</span>
@@ -60,7 +76,9 @@ export default async function ProductDetailsPage({params,}: {params: Promise<{ s
             <span className="rounded-full bg-[#eaf4ec] px-2.5 py-0.5 text-xs font-semibold text-[#1B7F4B]">
               {product.categoryNameBn}
             </span>
-            <h1 className="mt-1 text-2xl font-bold text-gray-900">{product.nameBn}</h1>
+            <h1 className="mt-1 text-2xl font-bold text-gray-900">
+              {product.nameBn}
+            </h1>
             <p className="text-xs text-gray-500">প্রতি {unit}</p>
           </div>
         </div>
@@ -73,25 +91,36 @@ export default async function ProductDetailsPage({params,}: {params: Promise<{ s
             <span className="text-xs text-gray-500">/ {unit}</span>
             <span
               className={`ml-auto rounded-full px-2 py-0.5 text-xs font-semibold ${
-                isUp ? "bg-red-50 text-red-600" : isDown ? "bg-green-50 text-green-700" : "bg-gray-100"
+                isUp
+                  ? "bg-green-50 text-green-700"
+                  : isDown
+                  ? "bg-red-50 text-red-600"
+                  : "bg-gray-100 text-gray-600"
               }`}
             >
-              {isUp ? "▲" : isDown ? "▼" : "•"} {Math.abs(product.change.pct).toLocaleString("bn-BD")}%
+              {isUp ? "▲" : isDown ? "▼" : "•"}{" "}
+              {Math.abs(product.change.pct).toLocaleString("bn-BD")}%
             </span>
           </div>
 
           <div className="mt-3 grid grid-cols-3 gap-2 border-t border-gray-200 pt-2 text-xs">
             <div>
               <span className="block text-gray-400">গতকাল</span>
-              <span className="font-semibold">৳{product.yesterday.toLocaleString("bn-BD")}</span>
+              <span className="font-semibold">
+                ৳{product.yesterday.toLocaleString("bn-BD")}
+              </span>
             </div>
             <div>
               <span className="block text-gray-400">গত সপ্তাহ</span>
-              <span className="font-semibold">৳{product.lastWeek.toLocaleString("bn-BD")}</span>
+              <span className="font-semibold">
+                ৳{product.lastWeek.toLocaleString("bn-BD")}
+              </span>
             </div>
             <div>
               <span className="block text-gray-400">গত মাস</span>
-              <span className="font-semibold">৳{product.lastMonth.toLocaleString("bn-BD")}</span>
+              <span className="font-semibold">
+                ৳{product.lastMonth.toLocaleString("bn-BD")}
+              </span>
             </div>
           </div>
         </div>
@@ -100,21 +129,29 @@ export default async function ProductDetailsPage({params,}: {params: Promise<{ s
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-500">সর্বনিম্ন দর</p>
-          <p className="mt-1 text-2xl font-bold text-[#1B7F4B]">৳{minPrice.toLocaleString("bn-BD")}</p>
+          <p className="mt-1 text-2xl font-bold text-[#1B7F4B]">
+            ৳{minPrice.toLocaleString("bn-BD")}
+          </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-500">গড় দর</p>
-          <p className="mt-1 text-2xl font-bold text-gray-900">৳{avgPrice.toLocaleString("bn-BD")}</p>
+          <p className="mt-1 text-2xl font-bold text-gray-900">
+            ৳{avgPrice.toLocaleString("bn-BD")}
+          </p>
         </div>
         <div className="rounded-2xl border border-gray-200 bg-white p-4">
           <p className="text-xs text-gray-500">সর্বোচ্চ দর</p>
-          <p className="mt-1 text-2xl font-bold text-red-600">৳{maxPrice.toLocaleString("bn-BD")}</p>
+          <p className="mt-1 text-2xl font-bold text-red-600">
+            ৳{maxPrice.toLocaleString("bn-BD")}
+          </p>
         </div>
       </div>
 
       {markets.length > 0 && (
         <div className="overflow-x-auto rounded-2xl border border-gray-200 bg-white p-5">
-          <h2 className="mb-3 text-base font-bold text-gray-900">বাজারভিত্তিক আজকের দর</h2>
+          <h2 className="mb-3 text-base font-bold text-gray-900">
+            বাজারভিত্তিক আজকের দর
+          </h2>
           <table className="table w-full text-sm">
             <thead>
               <tr className="bg-gray-50 text-xs">
@@ -129,8 +166,12 @@ export default async function ProductDetailsPage({params,}: {params: Promise<{ s
                 <tr key={idx}>
                   <td className="font-semibold">{m.market}</td>
                   <td>{m.division}</td>
-                  <td className="text-[#1B7F4B]">৳{m.min.toLocaleString("bn-BD")}</td>
-                  <td className="text-red-600">৳{m.max.toLocaleString("bn-BD")}</td>
+                  <td className="text-[#1B7F4B]">
+                    ৳{m.min.toLocaleString("bn-BD")}
+                  </td>
+                  <td className="text-red-600">
+                    ৳{m.max.toLocaleString("bn-BD")}
+                  </td>
                 </tr>
               ))}
             </tbody>

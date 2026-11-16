@@ -128,13 +128,13 @@ export default function Navbar() {
           ) : (
             <>
               <Link href="/signin" className="btn btn-ghost btn-sm">
-                Sign In
+                সাইন ইন
               </Link>
               <Link
                 href="/signup"
                 className="btn btn-sm border-none bg-[#1B7F4B] text-white hover:bg-[#15663C]"
               >
-                Sign Up
+                সাইন আপ
               </Link>
             </>
           )}

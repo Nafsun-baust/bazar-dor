@@ -29,6 +29,7 @@ export default async function MarqueeComp() {
                 href={`/product/${item.slug}`}
                 className="mx-4 inline-flex items-center gap-1.5 hover:underline"
               >
+                <span>{item.image}</span>
                 <span className="font-semibold text-gray-800">{item.nameBn}</span>
                 <span className="text-gray-600">
                   {item.today.toLocaleString("bn-BD")} টাকা/{unitBn[item.unit] || item.unit}
@@ -36,9 +37,9 @@ export default async function MarqueeComp() {
                 <span
                   className={
                     isUp
-                      ? "font-semibold text-red-600"
-                      : isDown
                       ? "font-semibold text-green-700"
+                      : isDown
+                      ? "font-semibold text-red-600"
                       : "text-gray-500"
                   }
                 >
