@@ -53,4 +53,4 @@ Next.js, TypeScript, Tailwind CSS, DaisyUI, BetterAuth.
 
 ### Live Link & Repository
 - **Live:** https://bazar-dor-nafsun.vercel.app
-- **GitHub:** https://github.com/Nafsun-baust/B14-A7-Bazar-Dor
+- **GitHub:** https://github.com/Nafsun-baust/bazar-dor
